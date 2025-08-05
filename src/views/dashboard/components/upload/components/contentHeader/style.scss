@@ -1,0 +1,28 @@
+.uploadHeader {
+  border-bottom: 1px solid #e3eaf3;
+  padding: 20px;
+  padding-bottom: 8px;
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  .steps {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 0px;
+
+    button {
+      background: #f0f1f3;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+
+      &.active {
+        background: #2e54ff;
+        color: #fff;
+      }
+    }
+  }
+}

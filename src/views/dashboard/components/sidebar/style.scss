@@ -1,0 +1,42 @@
+.sidebarContainer {
+  border-right: 1px solid #cbd5e2;
+  .sidebarItemWrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 12.5px;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background: darken(#f0f0f0, 5%);
+    }
+
+    .label {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .icon {
+      width: 35px;
+      height: 35px;
+
+      svg {
+        width: 30px;
+        height: 30px
+      }
+    }
+  }
+
+  .sd-logo {
+    padding: 12.5px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid #cbd5e2;
+    width: 63px;
+
+    img {
+      height: 35px;
+      width: 35px;
+    }
+  }
+}

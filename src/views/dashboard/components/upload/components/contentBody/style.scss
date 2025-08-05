@@ -1,0 +1,66 @@
+.upload-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  padding-bottom: 0px;
+
+  .drop-area {
+    border: 2px dashed #c3c3c3;
+    background: #f8fafc;
+    padding: 60px;
+    text-align: center;
+    border-radius: 10px;
+    .btn-select {
+      background: #fff;
+      padding: 8px 20px;
+      border: 1px solid #2e54ff;
+      color: #2e54ff;
+      cursor: pointer;
+      border-radius: 6px;
+      display: inline-block;
+      margin: 10px 0;
+    }
+    .note {
+      font-size: 12px;
+      color: gray;
+    }
+  }
+
+  .form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+
+    input,
+    select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+
+    .btn-secondary {
+      background: #fff;
+      border: 1px solid #aaa;
+      padding: 6px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #2e54ff;
+      border: 1px solid #2e54ff;
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
+}
