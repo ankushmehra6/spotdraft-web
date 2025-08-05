@@ -13,6 +13,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/contracts/:contractId" element={<ContractDetails />} />
+            <Route path="/chat" element={<ContractDetails />} />
           </Routes>
         </div>
       </div>
