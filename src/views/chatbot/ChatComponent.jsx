@@ -1,152 +1,130 @@
-"use client"
-
-import { useChat } from "ai/react"
-import { useState, useRef, useEffect } from "react"
-import "./styles.scss"
-
-// Simple SVG icons as components
-const BotIcon = () => (
-  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-    />
-  </svg>
-)
-
-const UserIcon = () => (
-  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-    />
-  </svg>
-)
-
-const SendIcon = () => (
-  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-  </svg>
-)
+import { useState, useEffect, useRef } from "react";
+import "./style.scss";
 
 export default function ChatPage() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat()
-  const [isTyping, setIsTyping] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const inputRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const trimmed = input.trim();
+    if (!trimmed) return;
 
-  useEffect(() => {
-    setIsTyping(isLoading)
-  }, [isLoading])
+    const userMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: trimmed,
+    };
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (input.trim()) {
-      handleSubmit(e)
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("https://2383644dfec4.ngrok-free.app/chat/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: trimmed }),
+      });
+
+      const data = await res.json();
+
+      const botMessage = {
+        id: Date.now().toString() + "_bot",
+        role: "assistant",
+        content: data.answer || "Something went wrong.",
+      };
+
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (err) {
+      console.error("Error:", err);
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="chat-container">
-      {/* Header */}
-      <div className="chat-header">
-        <div className="header-content">
-          <h1>
-            <BotIcon />
-            ChatGPT Clone
-          </h1>
-        </div>
-      </div>
+    <div className="chatgpt-container">
+      <div className="chatgpt-main">
+        {messages.length === 0 ? (
+          <div className="empty-chat">
+            <h1>How can I help you today?</h1>
+            <p>Start a conversation below.</p>
+          </div>
+        ) : (
+          <div className="chatgpt-messages">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`chatgpt-message ${msg.role === "user" ? "user" : "bot"}`}
+              >
+                <div className="message-content">{msg.content}</div>
+              </div>
+            ))}
 
-      {/* Messages Container */}
-      <div className="messages-container">
-        <div className="messages-content">
-          {messages.length === 0 ? (
-            <div className="empty-state">
-              <BotIcon />
-              <h2>How can I help you today?</h2>
-              <p>Start a conversation by typing a message below.</p>
-            </div>
-          ) : (
-            <div className="messages-list">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`message-row ${message.role === "user" ? "user-message" : "assistant-message"}`}
-                >
-                  {message.role === "assistant" && (
-                    <div className="avatar bot-avatar">
-                      <BotIcon />
-                    </div>
-                  )}
-
-                  <div className={`message-bubble ${message.role === "user" ? "user-bubble" : "assistant-bubble"}`}>
-                    <p>{message.content}</p>
-                  </div>
-
-                  {message.role === "user" && (
-                    <div className="avatar user-avatar">
-                      <UserIcon />
-                    </div>
-                  )}
+            {isLoading && (
+              <div className="chatgpt-message bot">
+                <div className="message-content typing">
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                  <span className="dot"></span>
                 </div>
-              ))}
+              </div>
+            )}
 
-              {isTyping && (
-                <div className="typing-indicator">
-                  <div className="avatar bot-avatar">
-                    <BotIcon />
-                  </div>
-                  <div className="typing-bubble">
-                    <div className="typing-content">
-                      <div className="dots">
-                        <div className="dot"></div>
-                        <div className="dot"></div>
-                        <div className="dot"></div>
-                      </div>
-                      <span className="typing-text">AI is thinking...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </div>
 
-      {/* Input Form */}
-      <div className="input-section">
-        <div className="input-content">
-          <form onSubmit={onSubmit} className="input-form">
-            <div className="input-wrapper">
-              <input
-                type="text"
-                value={input}
-                onChange={handleInputChange}
-                placeholder="Type your message here..."
-                disabled={isLoading}
-                className="message-input"
-              />
-            </div>
-            <button type="submit" disabled={isLoading || !input.trim()} className="send-button">
-              <SendIcon />
-            </button>
-          </form>
-          <p className="input-hint">Press Enter to send your message</p>
-        </div>
-      </div>
+      <form onSubmit={handleSubmit} className="chatgpt-input-form">
+        <textarea
+          ref={inputRef}
+          className="chatgpt-input"
+          rows={1}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Message ChatGPT..."
+          disabled={isLoading}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
+        />
+        <button
+          type="submit"
+          disabled={!input.trim() || isLoading}
+          className="send-btn"
+        >
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </form>
     </div>
-  )
+  );
 }
